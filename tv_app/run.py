@@ -360,11 +360,13 @@ def channel_packages_home():
 
 @app.route('/add-channel-package', methods=['GET', 'POST'])
 def add_channel_package():
-    db_object = connect_to_db()
     if request.method == 'GET':
         try:
+            db_object = connect_to_db()
             channels = execute(db_object, 'SELECT * FROM channels;')
             result_channels = list(channels.fetchall())
+
+            db_object = connect_to_db()
             packages = execute(db_object, 'SELECT * FROM packages;')
             result_packages = list(packages.fetchall())
             return render_template('add_channel_package_form.html', channels=result_channels, packages=result_packages)
@@ -599,11 +601,13 @@ def subscriptions_home():
 
 @app.route('/add-subscription', methods=['GET', 'POST'])
 def add_subscription():
-    db_object = connect_to_db()
     if request.method == 'GET':
         try:
+            db_object = connect_to_db()
             subrs = execute(db_object, 'SELECT * FROM subscribers;')
             result_subrs = list(subrs.fetchall())
+
+            db_object = connect_to_db()
             pkgs = execute(db_object, 'SELECT * FROM packages;')
             result_packages = list(pkgs.fetchall())
             return render_template('add_subscription_form.html', pkgs=result_packages, subrs=result_subrs)
