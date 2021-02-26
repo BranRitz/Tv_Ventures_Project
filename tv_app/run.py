@@ -374,6 +374,7 @@ def add_channel_package():
             return render_template('error.html', e=e)
     elif request.method == 'POST':
         try:
+            db_object = connect_to_db()
             channel_id = request.form.get('channel')
             package_id = request.form.get('package')
 
@@ -615,6 +616,7 @@ def add_subscription():
             return render_template('error.html', e=e)
     elif request.method == 'POST':
         try:
+            db_object = connect_to_db()
             package = request.form.get('package')
             subscriber = request.form.get('subscriber')
             start_date = request.form.get('start-date')
