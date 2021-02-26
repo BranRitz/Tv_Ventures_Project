@@ -218,6 +218,7 @@ def add_tech():
             data = (first_name, last_name, employer_id, start_date)
             execute(db_object, query, data)
             print("Technician " + first_name + " " + last_name + " has been onboarded on date " + start_date + ".")
+
             return render_template('tmp_base.html', page_name="Technicians", redirect="technicians")
         except Exception as e:
             return render_template('error.html', e=e)
