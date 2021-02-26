@@ -19,6 +19,7 @@ def execute(db_connection = None, query = None, query_params = ()):
     print("Executing %s with %s" % (query, query_params))
 
     cursor = db_connection.cursor()
-
     cursor.execute(query, query_params)
+    db_connection.commit()
+    db_connection.close()
     return cursor
