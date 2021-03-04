@@ -6,23 +6,14 @@
 
 {% block content %}
 <h3>Update Subscription:</h3>
-<form id="update-subscription" action="/update-subscription/{{ subscription_id }}" method="post">
-    Subscription: <select name="subscription">
-        {% for s in subscriptions %}
-          <option value="{{ s[0] }}">{{ s[1] }}</option>
-        {% endfor %}
-    </select><br>
-    Package: <select name="package">
-        {% for p in packages %}
-          <option value="{{ p[0] }}">{{ p[1] }}</option>
-        {% endfor %}
-    </select><br>
-    Start Date: <input type="datetime-local" name="start-date"><br>
-    Last Renewal: <input type="datetime-local" name="renewal-date"><br>
-    Status: <input type="text" name="status"><br>
-    Subscriber Rating: <input type="number" name="rating"><br>
-    Premium? <input type="checkbox" name="premium"><br>
+<form id="update-subscription" action="/update-subscription/{{ subscription[0] }}" method="post">
+    Last Renewal: <input type="datetime-local" name="renewal-date" value="{{ subscription[4] }}"><br>
+    Status: <input type="text" name="status" value="{{ subscription[5] }}"><br>
+    Subscriber Rating: <input type="number" name="rating" value="{{ subscription[6] }}"><br>
+    Premium?* <input type="checkbox" name="premium" value="true"><br>
     <input type="submit" value="Submit">
  </form>
+<br>
+<p>*Whatever value is submitted will take. Blank does not mean empty, it means False.</p>
 <br/>
 {% endblock %}

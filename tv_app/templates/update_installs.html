@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content_top %}
+<h1>{% block title %}Update Installation{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<br>
+<h3>Update Installation:</h3>
+<br>
+<form id="update-install" action="/update-install/{{ install[0] }}" method="post">
+    Rating: <input type="number" name="rating" value = "{{ install[2] }}"><br>
+    Comments: <input type="text" name="install-comment" value = "{{ install[3] }}"><br>
+    <input type="submit" value="Submit">
+ </form>
+<br/>
+{% endblock %}
+
+

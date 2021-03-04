@@ -7,11 +7,13 @@
 {% block content %}
 <h3>Add New Package:</h3>
 <form id="add-package" action="/add-package" method="post">
-    Package Name: <input type="text" name="package-name"><br>
+    Package Name*: <input type="text" name="package-name"><br>
 
-    Standard Price: <input type="text" name="standard-price"><br>
-    Premium Price: <input type="text" name="premium-price"><br>
+    Standard Price*: <input type="text" name="standard-price"><br>
+    Premium Price*: <input type="text" name="premium-price"><br>
     <input type="submit" value="Submit">
  </form>
+ <br>
+<p>*Required</p>
 <br/>
 {% endblock %}

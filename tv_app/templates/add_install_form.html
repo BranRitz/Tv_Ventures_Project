@@ -5,10 +5,12 @@
 {% endblock %}
 
 {% block content %}
+<br>
 <h3>Add New Installation:</h3>
+<br>
 <form id="add-install" action="/add-install" method="post">
-    Technician: <select name="install-tech">
-        {% for t in technicians %}
+    Technician*: <select name="install-tech">
+        {% for t in techs %}
           <option value="{{ t[0] }}">{{ t[1] }}</option>
         {% endfor %}
     </select>
@@ -16,10 +18,13 @@
     'height=400,width=600,left=10,top=10,,scrollbars=yes,menubar=no'); return false;">
 
     <br>
-    Rating: <input type="number" name="rating"><br>
-    Date: <input type="datetime-local" name="install-date"><br>
+    Rating*: <input type="number" name="rating"><br>
     Comments: <input type="text" name="install-comment"><br>
+    Date*: <input type="datetime-local" name="install-date"><br>
     <input type="submit" value="Submit">
  </form>
+<br>
+<p>*Required</p>
 <br/>
 {% endblock %}
+

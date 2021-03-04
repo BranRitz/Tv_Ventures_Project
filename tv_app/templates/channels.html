@@ -14,7 +14,6 @@
         <th>Channel Name</th>
         <th>Channel Number</th>
         <th>Genre Name</th>
-        <th>Kid Friendly</th>
     </thead>
     <tbody>
       {% for r in rows %}
@@ -23,7 +22,6 @@
         <td> {{ r[1] }}</td>
         <td> {{ r[2] }}</td>
         <td> {{ r[3] }}</td>
-        <td> {{ r[4] }}</td>
         <td> <input type='button' name='updateChannel' value='update' onclick="window.location = '/update-channel/{{r[0]}}'"> </td>
         <td> <input type='button' name='deleteChannel' value='delete' onclick="window.location = '/delete-channel/{{r[0]}}'"> </td>
       </tr>

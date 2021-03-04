@@ -7,14 +7,14 @@
 {% block content %}
 <h3>Add New Subscriber:</h3>
 <form id="add-subscriber" action="/add-subscriber" method="post">
-    Phone Number: <input type="text" name="phone-number"><br>
-    First Name: <input type="text" name="fname"><br>
-    Last Name: <input type="text" name="lname"><br>
+    Phone Number*: <input type="text" name="phone-number"><br>
+    First Name*: <input type="text" name="fname"><br>
+    Last Name*: <input type="text" name="lname"><br>
     Age: <input type="number" name="age"><br>
+    Zip Code*: <input type="number" name="zip"><br>
     Gender: <input type="text" name="gender"><br>
-    Monthly Watch Time (mins): <input type="number" name="watch-time"><br>
 
-    Installation Technician: <select name="install">
+    Installation Technician*: <select name="install">
         {% for i in installations %}
           <option value="{{ i[0] }}">{{ i[1] }}</option>
         {% endfor %}
@@ -24,6 +24,8 @@
     <br>
     <input type="submit" value="Submit">
  </form>
+<br>
+<p>*Required</p>
 <br/>
 
 {% endblock %}

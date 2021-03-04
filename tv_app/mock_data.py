@@ -173,7 +173,8 @@ sample_packages = [[1, "Stars And Beyond", 20.00, 34.00, "month"], [2, "Reality 
 sample_installations = [[1, "Brandi Kuritz", 4, date.today(), "hi"], [2, "Joo An Choi", 3, date.today(), "bye"]]
 sample_technicians = [[1, "Brandi", "Kuritz", "bdk479478", date.today()], [2, "Joo An", "Choi", "jac484039", date.today()]]
 sample_channels = [[1, "Nickelodeon", 45, "animation", True], [2, "MTV", 70, "reality", False]]
-sample_channel_packages = [[1, 1, 2], [2, 2, 2], [3, 2, 1]]
+sample_channel_packages = [[1, "Nickelodeon", "Reality All Day"], [2, "MTV", "Reality All Day"],
+                           [3, "MTV", "Stars And Beyond"]]
 sample_subscribers = [[1, "555-555-5555", 91210, 1, 5540, 34, "female", "Tiffany", "Smith"],
                       [2, "555-555-5555", 78705, 2, 49000, 19, "male", "Richard", "Jones"]]
 sample_subscriptions = [[1, "Reality All Day", "Richard Jones", date.today(), date.today(), "ACTIVE", False, 3],
