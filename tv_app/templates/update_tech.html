@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+<head>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inpt.css') }}">
+  </head>
 <br>
 <h3>Update Technician:</h3>
 <form id="update-tech" action="/update-tech/{{ tech[0] }}" method="post">

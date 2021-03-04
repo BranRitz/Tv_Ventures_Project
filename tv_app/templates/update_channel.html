@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+<head>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inpt.css') }}">
+</head>
 <h3>Update Channel:</h3>
 <form id="update-channel" action="/update-channel/{{ channel[0] }}" method="post">
     Name: <input type="text" name="channel-name" value="{{ channel[1] }}"><br>
