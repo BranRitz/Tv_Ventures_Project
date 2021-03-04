@@ -14,6 +14,13 @@ input[type=text], select {
     border: none;
     cursor: pointer;
   }
+
+  select {
+    width: 40%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+  }
   
   input[type=submit]:hover {
     background-color: rgb(87, 135, 196, 0.5);;
