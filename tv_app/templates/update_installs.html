@@ -7,13 +7,13 @@
 {% block content %}
 <br>
 <h3>Update Installation:</h3>
-<form id="update-installs" action="/update-install/{{ install[0] }}" method="post">
-    <input type="hidden" name="installation_id" value = "{{ install[0] }}">
-    Technician ID: <input type="text" name="technician_id"  value = "{{ install[1] }} " SELECTED><br>
-    Installation Rating: <input type="text" name="installation_rating"  value = "{{ install[2] }}"><br>
-    Comments: <input type="text" name="comments" value = "{{ install[3] }}"><br>
-    Date : <input type="date" name="installation_date" value = "{{ install[4] }}"><br>
+<br>
+<form id="update-install" action="/update-install/{{ install[0] }}" method="post">
+    Rating: <input type="number" name="rating" value = "{{ install[2] }}"><br>
+    Comments: <input type="text" name="install-comment" value = "{{ install[3] }}"><br>
     <input type="submit" value="Submit">
  </form>
 <br/>
 {% endblock %}
+
+

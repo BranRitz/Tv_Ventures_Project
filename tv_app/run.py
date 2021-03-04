@@ -65,50 +65,38 @@ def install_home():
 
 @app.route('/update-install/<install_id>', methods=['GET', 'POST'])
 def update_install(install_id):
-    db_object = connect_to_db()
     if request.method == 'GET':
         try:
-            install_query = 'SELECT * from installations WHERE installation_id = "%s"' % (install_id)
-            install_out = execute(db_object, install_query).fetchone()
-
-            technician_query = 'SELECT * from technicians'
-            tech_out = execute(db_object, technician_query).fetchall()
-
-            if install_out == None:
-                return "No installation has been found."
-
-            return render_template('update_installs.html', install = install_out, techs = tech_out)
+            db_object = connect_to_db()
+            query = "SELECT * FROM `installations` WHERE `installation_id` = %d;" % int(install_id)
+            install = list(execute(db_object, query).fetchone())
+            return render_template('update_installs.html', install=install)
         except Exception as e:
             return render_template('error.html', e=e)
 
     elif request.method == 'POST':
         try:
-            technician_id = request.form['technician_id']
-            installation_rating = request.form['installation_rating']
-            comments = request.form['comments']
-            installation_date = request.form['installation_date']
-            update_install_query = "UPDATE installations SET technician_id = \"%s\", installation_rating = \"%s\", " \
-                                   "comments = \"%s\", installation_date = \"%s\" WHERE installation_id = \"%s\""
-            data = (technician_id, installation_rating, comments, installation_date)
-            execute(db_object, update_install_query, data)
-            print("Installation updated")
-            install_out = execute(db_object, "SELECT * from installations;")
-            return render_template('installs.html', installs = install_out)
+            db_object = connect_to_db()
+            # Parse out updated fields.
+            rating = request.form.get('rating')
+            comments = request.form.get('install-comment')
+
+            set_str = ""
+            if rating is not None and len(rating) > 0:
+                set_str = set_str + " installation_rating = %d," % int(rating)
+            if comments is not None and len(comments) > 0:
+                set_str = set_str + " comments = \"%s\"," % comments
+
+            if len(set_str) == 0:
+                return render_template('nothing_to_update.html')
+            else:
+                set_str = set_str.rstrip(',')
+
+            query = f"UPDATE `installations` SET{set_str} WHERE `installation_id` = %d;" % int(install_id)
+            execute(db_object, query)
+            return render_template('tmp_base.html', page_name="Installations", redirect="installations")
         except Exception as e:
             return render_template('error.html', e=e)
-
-
-@app.route('/delete-install/<int:installation_id>')
-def delete_install(installation_id):
-    db_object = connect_to_db()
-    data = (installation_id,)
-    query = "DELETE FROM installations WHERE installation_id = \"%s\";"
-    result = execute(db_object, query, data)
-    print("Installation deleted")
-    print(str(result.rowcount) + "row deleted")
-    installs = execute(db_object,   "SELECT installation_id, CONCAT(first_name, ' ' ,last_name) AS full_name, installation_rating, installation_date, comments " \
-                                    "FROM installations JOIN technicians ON installations.technician_id = technicians.technician_id")
-    return render_template('installs.html', installs = installs)
 
 
 @app.route('/add-install', methods=['GET', 'POST'])
@@ -151,6 +139,17 @@ def add_install():
             return render_template('error.html', e=e)
 
 
+@app.route('/delete-install/<int:install_id>')
+def del_install(install_id):
+    try:
+        db_object = connect_to_db()
+        query = "DELETE FROM `installations` WHERE `installation_id` = %d;" % install_id
+        execute(db_object, query)
+        return render_template('tmp_base.html', page_name="Installations", redirect="installations")
+    except Exception as e:
+        return render_template('error.html', e=e)
+
+
 # ---- TECHNICIANS ----
 @app.route('/technicians')
 def tech_home():
@@ -189,10 +188,10 @@ def populate_tech():
 
 @app.route('/add-tech', methods=['POST', 'GET'])
 def add_tech():
-    db_object = connect_to_db()
     if request.method == 'GET':
         try:
-            query = 'SELECT first_name, last_name from technicians;'
+            db_object = connect_to_db()
+            query = 'SELECT * from technicians;'
             result = list(execute(db_object, query).fetchall())
             print("Displaying current technicians:\n")
             print(result)
@@ -201,6 +200,7 @@ def add_tech():
             return render_template('error.html', e=e)
     elif request.method == 'POST':
         try:
+            db_object = connect_to_db()
             first_name = request.form['fname']
             last_name = request.form['lname']
             employer_id = uuid.uuid4().hex
@@ -215,8 +215,9 @@ def add_tech():
 
             query = 'INSERT INTO `technicians` (`first_name`, `last_name`, `employer_id`, `start_date`) ' \
                     'VALUES (\"%s\", \"%s\", \"%s\", \"%s\");'
-            data = (first_name, last_name, employer_id, start_date)
-            execute(db_object, query, data)
+
+            data = (first_name, last_name, employer_id, str(start_date))
+            result = execute(db_object, query, data)
             print("Technician " + first_name + " " + last_name + " has been onboarded on date " + start_date + ".")
 
             return render_template('tmp_base.html', page_name="Technicians", redirect="technicians")
@@ -226,42 +227,48 @@ def add_tech():
 
 @app.route('/update-tech/<int:technician_id>', methods=['GET', 'POST'])
 def update_tech(technician_id):
-    db_object = connect_to_db()
     if request.method == 'GET':
-        query = 'SELECT * from technicians WHERE technician_id = \"%s\"' % (technician_id)
+        db_object = connect_to_db()
+        query = 'SELECT * from technicians WHERE technician_id = %d;' % int(technician_id)
         out = execute(db_object, query).fetchone()
-
-        if out == None:
+        if out is None:
             return "No tech has been found."
-
-        return render_template('update_tech.html', tech = out)
+        return render_template('update_tech.html', tech=out)
 
     elif request.method == 'POST':
-        print('The POST request')
-        tech_id = request.form['technician_id']
-        first_name = request.form['fname']
-        last_name = request.form['lname']
-        start_date = request.form['start_date']
-        update_tech_query = "UPDATE technicians SET first_name = \"%s\", last_name = \"%s\", start_date = \"%s\" WHERE technician_id = \"%s\";"
-        data = (first_name, last_name, start_date, tech_id)
-        execute(db_object, update_tech_query, data)
-        print("Technician updated")
-        techs = execute(db_object, "SELECT * from technicians;")
-        return render_template('techs.html', techs = techs)
+        try:
+            db_object = connect_to_db()
+            # Parse out updated fields.
+            first_name = request.form.get('fname')
+            last_name = request.form.get('lname')
+
+            set_str = ""
+            if first_name is not None and len(first_name) > 0:
+                set_str = set_str + " first_name = \"%s\"," % first_name
+            if last_name is not None and len(last_name) > 0:
+                set_str = set_str + " last_name = \"%s\"," % last_name
+
+            if len(set_str) == 0:
+                return render_template('nothing_to_update.html')
+            else:
+                set_str = set_str.rstrip(',')
+
+            query = f"UPDATE `technicians` SET{set_str} WHERE `technician_id` = %d;" % int(technician_id)
+            execute(db_object, query)
+            return render_template('tmp_base.html', page_name="Technicians", redirect="technicians")
+        except Exception as e:
+            return render_template('error.html', e=e)
 
 
-@app.route('/delete-tech/<int:technician_id>')
-def delete_tech(technician_id):
-    db_object = connect_to_db()
-    data = (technician_id,)
-    query = "DELETE FROM technicians WHERE technician_id = \"%s\";"
-    result = execute(db_object, query, data)
-    result.close()
-    print(str(result.rowcount) + " row deleted")
-
-    print("Technician deleted")
-    techs = execute(db_object, "SELECT * from technicians;")
-    return render_template('techs.html', techs = techs)
+@app.route('/delete-tech/<int:tech_id>')
+def del_tech(tech_id):
+    try:
+        db_object = connect_to_db()
+        query = "DELETE FROM `technicians` WHERE `technician_id` = %d;" % tech_id
+        execute(db_object, query)
+        return render_template('tmp_base.html', page_name="Technicians", redirect="technicians")
+    except Exception as e:
+        return render_template('error.html', e=e)
 
 
 # ---- CHANNELS ----
@@ -270,7 +277,7 @@ def channels_home():
     db_object = connect_to_db()
     try:
         query = 'SELECT channel_id, channel_name, channel_number, genre_name, kid_friendly FROM channels ' \
-                'JOIN channel_genres ON channels.channel_genre_id=channel_genres.channel_genre_id;'
+                'LEFT JOIN channel_genres ON channels.channel_genre_id=channel_genres.channel_genre_id;'
         channels = execute(db_object, query)
         result = list(channels.fetchall())
 
@@ -290,16 +297,18 @@ def channels_home():
 
 @app.route('/add-channel', methods=['GET', 'POST'])
 def add_channel():
-    db_object = connect_to_db()
     if request.method == 'GET':
+        db_object = connect_to_db()
         try:
             genres = execute(db_object, 'SELECT * FROM channel_genres;')
             result = list(genres.fetchall())
+            result.insert(0, None)
             return render_template('add_channel_form.html', genres=result)
         except Exception as e:
             return render_template('error.html', e=e)
 
     elif request.method == 'POST':
+        db_object = connect_to_db()
         try:
             name = request.form.get('channel-name')
             number = request.form.get('channel-number')
@@ -314,19 +323,20 @@ def add_channel():
             else:
                 msg = "Channel number is required."
                 raise Exception(msg)
-            if genre is not None:
-                genre = int(genre)
-            else:
-                msg = "Channel genre is required."
-                raise Exception(msg)
             if number <= 0 or number >= 1000:
                 msg = "Channel number must be between 0 and 1000."
                 raise Exception(msg)
+            if len(genre) > 0:
+                genre = int(genre)
+                query = "INSERT INTO `channels` (`channel_name`, `channel_number`, `channel_genre_id`) " \
+                        "VALUES (\"%s\", %d, %d);" % (name, number, genre)
+            else:
+                query = "INSERT INTO `channels` (`channel_name`, `channel_number`) " \
+                        "VALUES (\"%s\", %d);" % (name, number)
+
+            execute(db_object, query)
 
             # Execute insert statement.
-            query = "INSERT INTO `channels` (`channel_name`, `channel_number`, `channel_genre_id`) " \
-                    "VALUES (\"%s\", %d, %d);" % (name, number, genre)
-            execute(db_object, query)
             return render_template('tmp_base.html', page_name="Channels", redirect="channels")
         except Exception as e:
             return render_template('error.html', e=e)
@@ -334,14 +344,52 @@ def add_channel():
 
 @app.route('/update-channel/<int:channel_id>', methods=['GET', 'POST'])
 def update_channel(channel_id):
-    db_object = connect_to_db()
     if request.method == 'GET':
+        db_object = connect_to_db()
         genres = execute(db_object, 'SELECT * FROM channel_genres;')
         result = list(genres.fetchall())
-        return render_template('update_channel.html', genres=result, channel_id=channel_id)
+        result.insert(0, None)
+        db_object = connect_to_db()
+        query = "SELECT * FROM `channels` WHERE `channel_id` = %d;" % int(channel_id)
+        channel = list(execute(db_object, query).fetchone())
+        return render_template('update_channel.html', genres=result, channel=channel)
 
     elif request.method == 'POST':
-        return render_template('tmp_base.html')
+        try:
+            db_object = connect_to_db()
+            # Parse out updated fields.
+            name = request.form.get('channel-name')
+            number = request.form.get('channel-number')
+            genre = request.form.get('channel-genre')
+
+            set_str = ""
+            if len(name) > 0:
+                set_str = set_str + " channel_name = \"%s\"," % name
+            if len(number) > 0:
+                set_str = set_str + " channel_number = %d," % number
+            if len(genre) > 0:
+                set_str = set_str + " channel_genre_id = \"%s\"," % genre
+
+            if len(set_str) == 0:
+                return render_template('nothing_to_update.html')
+            else:
+                set_str = set_str.rstrip(',')
+            query = f"UPDATE `channels` SET{set_str} WHERE `channel_id` = %d;" % channel_id
+            execute(db_object, query)
+            return render_template('tmp_base.html', page_name="Channels", redirect="channels")
+        except Exception as e:
+            return render_template('error.html', e=e)
+
+
+@app.route('/delete-channel/<int:channel_id>')
+def del_channel(channel_id):
+    try:
+        db_object = connect_to_db()
+        query = "DELETE FROM `channels` WHERE `channel_id` = %d;" % channel_id
+        execute(db_object, query)
+        return render_template('tmp_base.html', page_name="Channels", redirect="channels")
+    except Exception as e:
+        return render_template('error.html', e=e)
 
 
 # ---- CHANNEL PACKAGES ----
@@ -393,6 +441,17 @@ def add_channel_package():
             return render_template('tmp_base.html', page_name="Channel Packages", redirect="channel-packages")
         except Exception as e:
             return render_template('error.html', e=e)
+
+
+@app.route('/delete-channel-pkg/<int:channel_pkg_id>')
+def del_channel_package(channel_pkg_id):
+    try:
+        db_object = connect_to_db()
+        query = "DELETE FROM `channel_packages` WHERE `channel_package_id` = %d;" % channel_pkg_id
+        execute(db_object, query)
+        return render_template('tmp_base.html', page_name="Channel Packages", redirect="channel-packages")
+    except Exception as e:
+        return render_template('error.html', e=e)
 
 
 # ---- SUBSCRIBER ----
@@ -566,15 +625,16 @@ def add_subscriber():
             return render_template('error.html', e=e)
 
 
-@app.route('/update-subscriber/<int:subscriber_id>', methods=['GET', 'POST'])
-def update_subscriber(subscriber_id):
-    db_object = connect_to_db()
-    if request.method == 'GET':
-        return render_template('update_subscriber.html', subscriber_id=subscriber_id,
-                               installations=sample_installations)
 
-    elif request.method == 'POST':
-        return render_template('tmp_base.html')
+@app.route('/delete-subscriber/<int:subscriber_id>')
+def del_subscriber(subscriber_id):
+    try:
+        db_object = connect_to_db()
+        query = "DELETE FROM `subscribers` WHERE `subscriber_id` = %d;" % subscriber_id
+        execute(db_object, query)
+        return render_template('tmp_base.html', page_name="Subscribers", redirect="subscribers")
+    except Exception as e:
+        return render_template('error.html', e=e)
 
 
 # ---- SUBSCRIPTIONS ----
@@ -637,16 +697,6 @@ def add_subscription():
             if len(status) < 1:
                 status = "New"
 
-            # renewal = datetime.strptime(renewal_date[:-6], "%Y/%m/%d")
-            # start = datetime.strptime(start_date[:-6], "%Y/%m/%d")
-            # present = datetime.now()
-            # if renewal.date() > start.date():
-            #     msg = "Last renewal cannot occur before the start date."
-            #     raise Exception(msg)
-            # if renewal.date() > present.date():
-            #     msg = "last renewal cannot be after today's date."
-            #     raise Exception(msg)
-
             if premium is not None and premium == "true":
                 premium = 1
             else:
@@ -675,12 +725,44 @@ def add_subscription():
 
 @app.route('/update-subscription/<int:subscription_id>', methods=['GET', 'POST'])
 def update_subscription(subscription_id):
-    db_object = connect_to_db()
     if request.method == 'GET':
-        return render_template('update_subscription.html', subscription_id=subscription_id,
-                               packages=sample_packages, subscribers=sample_subscribers)
+        db_object = connect_to_db()
+        query = "SELECT * FROM `subscriptions` WHERE `subscription_id` = %d;" % int(subscription_id)
+        subscription = list(execute(db_object, query).fetchone())
+        print("HEREEE", subscription)
+        return render_template('update_subscription.html', subscription=subscription)
     elif request.method == 'POST':
-        return render_template('tmp_base.html')
+        try:
+            db_object = connect_to_db()
+            # Parse out updated fields.
+            last_renewal = request.form.get('renewal-date')
+            status = request.form.get('status')
+            premium = request.form.get('premium')
+            rating = request.form.get('rating')
+
+            set_str = ""
+            if last_renewal is not None and len(last_renewal) > 0:
+                set_str = set_str + " last_renewed = \"%s\"," % last_renewal
+            if status is not None and len(status) > 0:
+                set_str = set_str + " subscription_status = \"%s\"," % status
+            if premium is not None:
+                if premium == "true":
+                    premium = 1
+                else:
+                    premium = 0
+                set_str = set_str + " premium = %d," % premium
+            if len(rating) > 0:
+                set_str = set_str + " subscriber_rating = %d," % int(rating)
+
+            if len(set_str) == 0:
+                return render_template('nothing_to_update.html')
+            else:
+                set_str = set_str.rstrip(',')
+            query = f"UPDATE `subscriptions` SET{set_str} WHERE `subscription_id` = %d;" % int(subscription_id)
+            execute(db_object, query)
+            return render_template('tmp_base.html', page_name="Subscriptions", redirect="subscriptions")
+        except Exception as e:
+            return render_template('error.html', e=e)
 
 
 # ---- PACKAGES ----
@@ -720,8 +802,11 @@ def add_package():
                 msg = "Premium price is required."
                 raise Exception(msg)
 
+            premium_price = round(float(premium_price), 2)
+            standard_price = round(float(standard_price), 2)
+
             query = "INSERT INTO `packages` (`package_name`, `standard_price`, `premium_price`) " \
-                    "VALUES (\"%s\", %d, %d);" % (package_name, float(standard_price), float(premium_price))
+                    "VALUES (\"%s\", %f, %f);" % (package_name, float(standard_price), float(premium_price))
             execute(db_object, query)
             return render_template('tmp_base.html', page_name="Packages", redirect="packages")
         except Exception as e:
@@ -730,11 +815,48 @@ def add_package():
 
 @app.route('/update-package/<int:package_id>', methods=['GET', 'POST'])
 def update_package(package_id):
-    db_object = connect_to_db()
     if request.method == 'GET':
-        return render_template('update_package.html', package_id=package_id)
+        db_object = connect_to_db()
+        query = "SELECT * FROM `packages` WHERE `package_id` = %d;" % int(package_id)
+        package = list(execute(db_object, query).fetchone())
+        return render_template('update_package.html', package=package)
     elif request.method == 'POST':
-        return render_template('tmp_base.html')
+        try:
+            db_object = connect_to_db()
+            # Parse out updated fields.
+            standard = request.form.get('standard-price')
+            prem = request.form.get('premium-price')
+            name = request.form.get('package-name')
+
+            set_str = ""
+            if standard is not None and len(standard) > 0:
+                set_str = set_str + " standard_price = %f," % round(float(standard), 2)
+            if prem is not None and len(prem) > 0:
+                set_str = set_str + " premium_price = %f," % round(float(prem), 2)
+            if name is not None and len(name) > 0:
+                set_str = set_str + " package_name = \"%s\"," % name
+
+            if len(set_str) == 0:
+                return render_template('nothing_to_update.html')
+            else:
+                set_str = set_str.rstrip(',')
+
+            query = f"UPDATE `packages` SET{set_str} WHERE `package_id` = %d;" % int(package_id)
+            execute(db_object, query)
+            return render_template('tmp_base.html', page_name="Packages", redirect="packages")
+        except Exception as e:
+            return render_template('error.html', e=e)
+
+
+@app.route('/delete-package/<int:pkg_id>')
+def del_package(pkg_id):
+    try:
+        db_object = connect_to_db()
+        query = "DELETE FROM `packages` WHERE `package_id` = %d;" % pkg_id
+        execute(db_object, query)
+        return render_template('tmp_base.html', page_name="Packages", redirect="packages")
+    except Exception as e:
+        return render_template('error.html', e=e)
 
 
 # ---- GENRES ----

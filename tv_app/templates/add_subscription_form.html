@@ -7,7 +7,7 @@
 {% block content %}
 <h3>Add New Subscription:</h3>
 <form id="add-subscription" action="/add-subscription" method="post">
-    Subscriber: <select name="subscriber">
+    Subscriber*: <select name="subscriber">
         {% for s in subrs %}
           <option value="{{ s[0] }}">{{ s[1] }}</option>
         {% endfor %}
@@ -15,7 +15,7 @@
     <input type='button' name='addSubscriber' value='Add Subscriber' onclick="window.open('/add-subscriber',
     'popUpWindow','height=400,width=600,left=10,top=10,,scrollbars=yes,menubar=no'); return false;">
     <br>
-    Package: <select name="package">
+    Package*: <select name="package">
         {% for p in pkgs %}
           <option value="{{ p[0] }}">{{ p[1] }}</option>
         {% endfor %}
@@ -23,12 +23,14 @@
     <input type='button' name='addPackage' value='Add Package' onclick="window.open('/add-package', 'popUpWindow',
     'height=400,width=600,left=10,top=10,,scrollbars=yes,menubar=no'); return false;">
     <br>
-    Start Date: <input type="datetime-local" name="start-date"><br>
-    Last Renewal: <input type="datetime-local" name="renewal-date"><br>
-    Status: <input type="text" name="status"><br>
+    Start Date*: <input type="datetime-local" name="start-date"><br>
+    Last Renewal*: <input type="datetime-local" name="renewal-date"><br>
+    Status*: <input type="text" name="status"><br>
     Subscriber Rating: <input type="number" name="rating"><br>
     Premium? <input type="checkbox" name="premium" value="true"><br>
     <input type="submit" value="Submit">
  </form>
+<br>
+<p>*Required</p>
 <br/>
 {% endblock %}

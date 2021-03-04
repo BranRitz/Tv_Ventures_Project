@@ -6,15 +6,17 @@
 
 {% block content %}
 <h3>Update Channel:</h3>
-<form id="update-channel" action="/update-channel/{{ channel_id }}" method="post">
-    Name: <input type="text" name="channel-name"><br>
-    Number: <input type="number" name="channel-number"><br>
-    Genre: <select name="channel-genre">
+<form id="update-channel" action="/update-channel/{{ channel[0] }}" method="post">
+    Name: <input type="text" name="channel-name" value="{{ channel[1] }}"><br>
+    Number: <input type="number" name="channel-number" value="{{channel[2] }}"><br>
+    Genre*: <select name="channel-genre">
         {% for g in genres %}
           <option value="{{ g[0] }}">{{ g[1] }}</option>
         {% endfor %}
     </select><br>
     <input type="submit" value="Submit">
  </form>
+<br>
+<p>*Whatever value is submitted will take. Blank does not mean empty, it means None.</p>
 <br/>
 {% endblock %}

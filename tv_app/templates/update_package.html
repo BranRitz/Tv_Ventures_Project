@@ -6,10 +6,10 @@
 
 {% block content %}
 <h3>Update Package:</h3>
-<form id="update-package" action="/update-package/{{ package_id }}" method="post">
-    Package Name: <input type="text" name="package-name"><br>
-    Standard Price: <input type="text" name="standard-price"><br>
-    Premium Price: <input type="text" name="premium-price"><br>
+<form id="update-package" action="/update-package/{{ package[0] }}" method="post">
+    Package Name: <input type="text" name="package-name" value = "{{ package[1] }}"><br>
+    Standard Price: <input type="text" name="standard-price" value = "{{ package[2] }}"><br>
+    Premium Price: <input type="text" name="premium-price" value = "{{ package[3] }}"><br>
     <input type="submit" value="Submit">
  </form>
 <br/>
