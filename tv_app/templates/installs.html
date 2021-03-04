@@ -6,11 +6,14 @@
 
 {% block content %}
 <br>
-<head><title>Installations</title></head>
+<head>
+  <title>Installations</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='tabl.css') }}">
+</head>
 <h3><a href='/add-install'>Add New Installation</a></h3>
 
 <h3>Installations</h3>
-<table border='1'>
+<table id = 'tbl'>
     <thead>
         <th>ID</th>
         <th>Technician Name</th>

@@ -5,10 +5,13 @@
 {% endblock %}
 
 {% block content %}
+<head>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='tabl.css') }}">
+</head>
 <h3><a href='/add-subscription'>Add New Subscription</a></h3>
 
 <h3>Subscriptions</h3>
-<table border='1'>
+<table id ='tbl'>
     <thead>
         <th>ID</th>
         <th>Package Name</th>

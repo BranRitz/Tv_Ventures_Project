@@ -5,10 +5,13 @@
 {% endblock %}
 
 {% block content %}
-<h3><a href='/add-channel'>Add New Channels</a></h3>
+<head>
+  <title>Channels</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='tabl.css') }}">
+</head>
 
-<h3>Channels</h3>
-<table border='1'>
+<h3><a href='/add-channel'>Add New Channels</a></h3>
+<table id ='tbl'>
     <thead>
         <th>ID</th>
         <th>Channel Name</th>
