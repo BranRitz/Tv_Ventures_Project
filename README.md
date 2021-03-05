@@ -10,13 +10,6 @@ In the top level directory (should see run.py and requirements.txt at this level
 4) `export FLASK_APP=run.py`
 5) `flask run`
 
-Joo An's local setup
-1) Clone repo
-2) virtualenv venv -p $(which python3) 
-3) source ./venv/bin/activate
-4) pip3 install --upgrade pip
-5) pip install -r requirements.txt
-
 Should be able to hit the different endpoints at http://127.0.0.1:5000/
 
 Examples: http://127.0.0.1:5000/installations or http://localhost:5000/subscriptions

@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+<head>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
+</head>
 <h3>Add New Subscriber:</h3>
 <form id="add-subscriber" action="/add-subscriber" method="post">
     Phone Number*: <input type="text" name="phone-number"><br>

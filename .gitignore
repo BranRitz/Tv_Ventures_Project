@@ -1,0 +1,4 @@
+tv_app/__pycache__/
+__pycache__/
+test/bin
+test/lib
