@@ -9,7 +9,7 @@
 <form id="update-subscription" action="/update-subscription/{{ subscription[0] }}" method="post">
     Last Renewal: <input type="datetime-local" name="renewal-date" value="{{ subscription[4] }}"><br>
     Status: <input type="text" name="status" value="{{ subscription[5] }}"><br>
-    Subscriber Rating: <input type="number" name="rating" value="{{ subscription[6] }}"><br>
+    Subscriber Rating (1-5): <input type="number" name="rating" value="{{ subscription[6] }}"><br>
     Premium?* <input type="checkbox" name="premium" value="true"><br>
     <input type="submit" value="Submit">
  </form>

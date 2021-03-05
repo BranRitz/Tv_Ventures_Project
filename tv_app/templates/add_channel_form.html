@@ -8,7 +8,7 @@
 <h3>Add New Channel:</h3>
 <form id="add-channel" action="/add-channel" method="post">
     Name*: <input type="text" name="channel-name"><br>
-    Number*: <input type="number" name="channel-number"><br>
+    Number* (1-999): <input type="number" name="channel-number"><br>
 
     Genre: <select name="channel-genre">
         {% for g in genres %}

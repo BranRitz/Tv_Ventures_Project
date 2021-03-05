@@ -81,6 +81,10 @@ def update_install(install_id):
             rating = request.form.get('rating')
             comments = request.form.get('install-comment')
 
+            if rating < 0 or rating > 5:
+                msg = "Rating must be between 1 and 5."
+                raise Exception(msg)
+
             set_str = ""
             if rating is not None and len(rating) > 0:
                 set_str = set_str + " installation_rating = %d," % int(rating)
@@ -356,17 +360,22 @@ def update_channel(channel_id):
 
     elif request.method == 'POST':
         try:
+            print("HERE")
             db_object = connect_to_db()
             # Parse out updated fields.
             name = request.form.get('channel-name')
             number = request.form.get('channel-number')
             genre = request.form.get('channel-genre')
 
+            if number <= 0 or number >= 1000:
+                msg = "Channel number must be between 1 and 999."
+                raise Exception(msg)
+
             set_str = ""
             if len(name) > 0:
                 set_str = set_str + " channel_name = \"%s\"," % name
             if len(number) > 0:
-                set_str = set_str + " channel_number = %d," % number
+                set_str = set_str + " channel_number = %d," % int(number)
             if len(genre) > 0:
                 set_str = set_str + " channel_genre_id = \"%s\"," % genre
 
@@ -374,7 +383,9 @@ def update_channel(channel_id):
                 return render_template('nothing_to_update.html')
             else:
                 set_str = set_str.rstrip(',')
+
             query = f"UPDATE `channels` SET{set_str} WHERE `channel_id` = %d;" % channel_id
+            print("QUERY", query)
             execute(db_object, query)
             return render_template('tmp_base.html', page_name="Channels", redirect="channels")
         except Exception as e:
@@ -640,21 +651,27 @@ def del_subscriber(subscriber_id):
 # ---- SUBSCRIPTIONS ----
 @app.route('/subscriptions')
 def subscriptions_home():
-    db_object = connect_to_db()
     try:
-        subs = execute(db_object, 'SELECT * FROM subscriptions;')
+        db_object = connect_to_db()
+        query = 'SELECT subscription_id, package_name, first_name, last_name, time_start, last_renewed, ' \
+                'subscription_status, premium, subscriber_rating FROM `subscriptions` ' \
+                'JOIN `packages` ON subscriptions.package_id = packages.package_id ' \
+                'JOIN `subscribers` ON subscriptions.subscriber_id = subscribers.subscriber_id;'
+        subs = execute(db_object, query)
         result = list(subs.fetchall())
         final_list = list()
         for r in result:
-            if r[7] == 0:
+            if r[8] == 0:
                 rating = "N/A"
             else:
                 rating = r[7]
-            if r[6] == 0:
+            if r[7] == 0:
                 prem = "False"
             else:
                 prem = "True"
-            final_list.append((r[0], r[1], r[2], r[3], r[4], r[5], prem, rating))
+            name = r[2] + ' ' + r[3]
+
+            final_list.append((r[0], r[1], name, r[4], r[5], r[6], prem, rating))
         return render_template('subscriptions.html', rows=final_list)
     except Exception as e:
         return render_template('error.html', e=e)
@@ -729,7 +746,6 @@ def update_subscription(subscription_id):
         db_object = connect_to_db()
         query = "SELECT * FROM `subscriptions` WHERE `subscription_id` = %d;" % int(subscription_id)
         subscription = list(execute(db_object, query).fetchone())
-        print("HEREEE", subscription)
         return render_template('update_subscription.html', subscription=subscription)
     elif request.method == 'POST':
         try:
@@ -739,6 +755,9 @@ def update_subscription(subscription_id):
             status = request.form.get('status')
             premium = request.form.get('premium')
             rating = request.form.get('rating')
+            if int(rating) > 5 or int(rating) < 1:
+                msg = "Rating must be between 1-5."
+                raise Exception(msg)
 
             set_str = ""
             if last_renewal is not None and len(last_renewal) > 0:
@@ -827,6 +846,10 @@ def update_package(package_id):
             standard = request.form.get('standard-price')
             prem = request.form.get('premium-price')
             name = request.form.get('package-name')
+
+            if prem < 0 or standard < 0:
+                msg = "Prices cannot be below 0."
+                raise Exception(msg)
 
             set_str = ""
             if standard is not None and len(standard) > 0:
