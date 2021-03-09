@@ -161,7 +161,6 @@ def tech_home():
     try:
         techs = execute(db_object, "SELECT * FROM technicians;")
         result = list(techs.fetchall())
-        print(result)
         for tech in techs:
             print("Displaying Technician: " + f"{tech[2]}, {tech[1]}")
         return render_template('techs.html', techs=result)
@@ -198,7 +197,6 @@ def add_tech():
             query = 'SELECT * from technicians;'
             result = list(execute(db_object, query).fetchall())
             print("Displaying current technicians:\n")
-            print(result)
             return render_template('add_tech_form.html')
         except Exception as e:
             return render_template('error.html', e=e)
@@ -218,10 +216,8 @@ def add_tech():
                 raise Exception(msg)
 
             query = 'INSERT INTO `technicians` (`first_name`, `last_name`, `employer_id`, `start_date`) ' \
-                    'VALUES (\"%s\", \"%s\", \"%s\", \"%s\");'
-
-            data = (first_name, last_name, employer_id, str(start_date))
-            result = execute(db_object, query, data)
+                    'VALUES (\"%s\", \"%s\", \"%s\", \"%s\");' % (first_name, last_name, employer_id, str(start_date))
+            execute(db_object, query)
             print("Technician " + first_name + " " + last_name + " has been onboarded on date " + start_date + ".")
 
             return render_template('tmp_base.html', page_name="Technicians", redirect="technicians")
@@ -360,14 +356,13 @@ def update_channel(channel_id):
 
     elif request.method == 'POST':
         try:
-            print("HERE")
             db_object = connect_to_db()
             # Parse out updated fields.
             name = request.form.get('channel-name')
             number = request.form.get('channel-number')
             genre = request.form.get('channel-genre')
 
-            if number <= 0 or number >= 1000:
+            if int(number) <= 0 or int(number) >= 1000:
                 msg = "Channel number must be between 1 and 999."
                 raise Exception(msg)
 
@@ -385,7 +380,6 @@ def update_channel(channel_id):
                 set_str = set_str.rstrip(',')
 
             query = f"UPDATE `channels` SET{set_str} WHERE `channel_id` = %d;" % channel_id
-            print("QUERY", query)
             execute(db_object, query)
             return render_template('tmp_base.html', page_name="Channels", redirect="channels")
         except Exception as e:
@@ -573,8 +567,9 @@ def subscriber_home():
                     gender = "N/A"
                 else:
                     gender = r[8]
+
                 final_list.append((r[0], r[1], r[2], r[3], r[4], r[5], age, gender))
-            return render_template('subscribers.html', rows=result)
+            return render_template('subscribers.html', rows=final_list)
         except Exception as e:
             return render_template('error.html', e=e)
 
@@ -616,7 +611,6 @@ def add_subscriber():
                 msg = "Zip code is required."
                 raise Exception(msg)
 
-            print("AGE", age)
             if len(age) > 0:
                 age = int(age)
             else:
@@ -664,13 +658,13 @@ def subscriptions_home():
             if r[8] == 0:
                 rating = "N/A"
             else:
-                rating = r[7]
+                rating = r[8]
             if r[7] == 0:
                 prem = "False"
             else:
                 prem = "True"
             name = r[2] + ' ' + r[3]
-
+            print("RATING", rating)
             final_list.append((r[0], r[1], name, r[4], r[5], r[6], prem, rating))
         return render_template('subscriptions.html', rows=final_list)
     except Exception as e:
@@ -706,11 +700,17 @@ def add_subscription():
             if package is None:
                 msg = "Package is required."
                 raise Exception(msg)
-            if len(rating) < 0 and (int(rating) > 5 or int(rating) <=0):
+            if len(start_date) < 1:
+                msg = "Start date is required."
+                raise Exception(msg)
+            if len(renewal_date) < 1:
+                msg = "Last renewal date is required."
+                raise Exception(msg)
+
+            print("RATING", rating)
+            if len(rating) > 0 and (int(rating) > 5 or int(rating) <= 0):
                 msg = "Rating must between 0 and 5."
                 raise Exception(msg)
-            elif len(rating) < 0:
-                rating = int(rating)
             if len(status) < 1:
                 status = "New"
 
@@ -720,13 +720,15 @@ def add_subscription():
                 premium = 0
 
             if len(rating) > 0:
+                print("WE ARE AN INT")
                 rating = int(rating)
                 query = "INSERT INTO `subscriptions` " \
                         "(`package_id`, `subscriber_id`, `time_start`, `last_renewed`, " \
                         "`subscription_status`, `premium`, `subscriber_rating`) " \
                         "VALUES (%d, %d, \"%s\", \"%s\", \"%s\", %d, %d);" % (int(package), int(subscriber), start_date,
-                                                                          renewal_date, status, int(premium), rating)
+                                                                              renewal_date, status, int(premium), rating)
             else:
+                print("WE ARE NONE")
                 rating = None
                 query = "INSERT INTO `subscriptions` " \
                         "(`package_id`, `subscriber_id`, `time_start`, `last_renewed`, " \
@@ -847,7 +849,7 @@ def update_package(package_id):
             prem = request.form.get('premium-price')
             name = request.form.get('package-name')
 
-            if prem < 0 or standard < 0:
+            if float(prem) < 0 or float(standard) < 0:
                 msg = "Prices cannot be below 0."
                 raise Exception(msg)
 
@@ -995,7 +997,7 @@ def add_all():
     subns = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `subscriptions`; CREATE TABLE `subscriptions`(`subscription_id` INT PRIMARY KEY " \
             "NOT NULL UNIQUE AUTO_INCREMENT, `package_id` INT(11) NOT NULL, `subscriber_id` INT(11) NOT NULL, " \
             "`time_start` DATETIME NOT NULL, `last_renewed` DATETIME NOT NULL, `subscription_status` VARCHAR(32) " \
-            "NOT NULL DEFAULT \"New\",`premium` boolean NOT NULL DEFAULT 0,`subscriber_rating` INT(11) NULL, " \
+            "NOT NULL DEFAULT \"New\", `premium` boolean NOT NULL DEFAULT 0, `subscriber_rating` INT(11) NULL, " \
             "FOREIGN KEY (`package_id`) REFERENCES `packages`(`package_id`) ON UPDATE CASCADE ON DELETE CASCADE, " \
             "FOREIGN KEY (`subscriber_id`) REFERENCES `subscribers`(`subscriber_id`) " \
             "ON UPDATE CASCADE ON DELETE CASCADE);"
