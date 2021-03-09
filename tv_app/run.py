@@ -81,7 +81,7 @@ def update_install(install_id):
             rating = request.form.get('rating')
             comments = request.form.get('install-comment')
 
-            if rating < 0 or rating > 5:
+            if int(rating) < 0 or int(rating) > 5:
                 msg = "Rating must be between 1 and 5."
                 raise Exception(msg)
 
@@ -173,18 +173,18 @@ def populate_tech():
     db_object = connect_to_db()
     execute(db_object, "DROP TABLE if EXISTS technicians;")
     create_tech_table = "CREATE TABLE technicians(technician_id INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT, " \
-                        "first_name VARCHAR(64) NOT NULL, last_name VARCHAR(64) NOT NULL, employer_id VARCHAR(36) " \
+                        "first_name VARCHAR(64) NOT NULL, last_name VARCHAR(64) NOT NULL, employee_id VARCHAR(36) " \
                         "NOT NULL, start_date DATE NOT NULL);"
     execute(db_object, create_tech_table)
     number_of_techs = 20
     for i in range(0, number_of_techs):
         first_name = random_name.generate_first_name()
         last_name = random_name.generate_last_names()
-        employer_id = uuid.uuid4().hex
+        employee_id = uuid.uuid4().hex
         start_date = random_start_date.generate_date()
-        query = 'INSERT INTO technicians (first_name, last_name, employer_id, start_date) ' \
+        query = 'INSERT INTO technicians (first_name, last_name, employee_id, start_date) ' \
                 'VALUES (\"%s\", \"%s\", \"%s\", \"%s\");'
-        data = (first_name, last_name, employer_id, start_date)
+        data = (first_name, last_name, employee_id, start_date)
         execute(db_object, query, data)
     return str(number_of_techs) + " technicians have been populated to table technicians"
 
@@ -205,7 +205,7 @@ def add_tech():
             db_object = connect_to_db()
             first_name = request.form['fname']
             last_name = request.form['lname']
-            employer_id = uuid.uuid4().hex
+            employee_id = uuid.uuid4().hex
             start_date = request.form['start_date']
 
             if first_name is None or len(first_name) < 1:
@@ -215,8 +215,8 @@ def add_tech():
                 msg = "Last name is required."
                 raise Exception(msg)
 
-            query = 'INSERT INTO `technicians` (`first_name`, `last_name`, `employer_id`, `start_date`) ' \
-                    'VALUES (\"%s\", \"%s\", \"%s\", \"%s\");' % (first_name, last_name, employer_id, str(start_date))
+            query = 'INSERT INTO `technicians` (`first_name`, `last_name`, `employee_id`, `start_date`) ' \
+                    'VALUES (\"%s\", \"%s\", \"%s\", \"%s\");' % (first_name, last_name, employee_id, str(start_date))
             execute(db_object, query)
             print("Technician " + first_name + " " + last_name + " has been onboarded on date " + start_date + ".")
 
@@ -373,6 +373,8 @@ def update_channel(channel_id):
                 set_str = set_str + " channel_number = %d," % int(number)
             if len(genre) > 0:
                 set_str = set_str + " channel_genre_id = \"%s\"," % genre
+            else:
+                set_str = set_str + " channel_genre_id = NULL,"
 
             if len(set_str) == 0:
                 return render_template('nothing_to_update.html')
@@ -504,14 +506,14 @@ def subscriber_home():
             result = list(subrs.fetchall())
             final_list = list()
             for r in result:
-                if r[7] == 0:
+                if r[6] == 0:
                     age = "N/A"
                 else:
-                    age = r[7]
-                if len(r[8]) == 0:
+                    age = r[6]
+                if len(r[7]) == 0:
                     gender = "N/A"
                 else:
-                    gender = r[8]
+                    gender = r[7]
                 final_list.append((r[0], r[1], r[2], r[3], r[4], r[5], age, gender))
 
             return render_template('subscribers.html', rows=final_list)
@@ -559,14 +561,14 @@ def subscriber_home():
             result = list(subrs.fetchall())
             final_list = list()
             for r in result:
-                if r[7] == 0:
+                if r[6] == 0:
                     age = "N/A"
                 else:
-                    age = r[7]
-                if len(r[8]) == 0:
+                    age = r[6]
+                if len(r[7]) == 0:
                     gender = "N/A"
                 else:
-                    gender = r[8]
+                    gender = r[7]
 
                 final_list.append((r[0], r[1], r[2], r[3], r[4], r[5], age, gender))
             return render_template('subscribers.html', rows=final_list)
@@ -628,7 +630,6 @@ def add_subscriber():
             return render_template('tmp_base.html', page_name="Subscribers", redirect="subscribers")
         except Exception as e:
             return render_template('error.html', e=e)
-
 
 
 @app.route('/delete-subscriber/<int:subscriber_id>')
@@ -707,7 +708,6 @@ def add_subscription():
                 msg = "Last renewal date is required."
                 raise Exception(msg)
 
-            print("RATING", rating)
             if len(rating) > 0 and (int(rating) > 5 or int(rating) <= 0):
                 msg = "Rating must between 0 and 5."
                 raise Exception(msg)
@@ -720,7 +720,6 @@ def add_subscription():
                 premium = 0
 
             if len(rating) > 0:
-                print("WE ARE AN INT")
                 rating = int(rating)
                 query = "INSERT INTO `subscriptions` " \
                         "(`package_id`, `subscriber_id`, `time_start`, `last_renewed`, " \
@@ -728,7 +727,6 @@ def add_subscription():
                         "VALUES (%d, %d, \"%s\", \"%s\", \"%s\", %d, %d);" % (int(package), int(subscriber), start_date,
                                                                               renewal_date, status, int(premium), rating)
             else:
-                print("WE ARE NONE")
                 rating = None
                 query = "INSERT INTO `subscriptions` " \
                         "(`package_id`, `subscriber_id`, `time_start`, `last_renewed`, " \
@@ -757,7 +755,8 @@ def update_subscription(subscription_id):
             status = request.form.get('status')
             premium = request.form.get('premium')
             rating = request.form.get('rating')
-            if int(rating) > 5 or int(rating) < 1:
+
+            if len(rating) < 0 and (int(rating) > 5 or int(rating) < 0):
                 msg = "Rating must be between 1-5."
                 raise Exception(msg)
 
@@ -772,8 +771,10 @@ def update_subscription(subscription_id):
                 else:
                     premium = 0
                 set_str = set_str + " premium = %d," % premium
-            if len(rating) > 0:
+            if len(rating) > 0 and int(rating) != 0:
                 set_str = set_str + " subscriber_rating = %d," % int(rating)
+            else:
+                set_str = set_str + " subscriber_rating = NULL,"
 
             if len(set_str) == 0:
                 return render_template('nothing_to_update.html')
@@ -957,140 +958,6 @@ def add_genre():
 def home():
     db_object = connect_to_db()
     return render_template('home.html')
-
-
-# ----- Testing purposes only below. ------
-@app.route('/add-all-tables')
-def add_all():
-    db_object = connect_to_db()
-    techs = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `technicians`; CREATE TABLE `technicians`(`technician_id` INT PRIMARY KEY " \
-            "NOT NULL UNIQUE AUTO_INCREMENT, `first_name` VARCHAR(64) NOT NULL, `last_name` VARCHAR(64) NOT NULL, " \
-            "`employer_id` VARCHAR(36) NOT NULL, `start_date` DATE NOT NULL);"
-    curr = execute(db_object, techs)
-    curr.close()
-
-    db_object = connect_to_db()
-    installs = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `installations`; CREATE TABLE `installations`(`installation_id` INT PRIMARY KEY " \
-               "NOT NULL UNIQUE AUTO_INCREMENT, `technician_id` INT(11) NOT NULL, `installation_rating` INT(11) NULL, " \
-               "`comments` VARCHAR(1096) NULL, `installation_date` DATE NOT NULL, FOREIGN KEY (`technician_id`) " \
-               "REFERENCES `technicians`(`technician_id`) ON DELETE CASCADE);"
-    curr = execute(db_object, installs)
-    curr.close()
-
-    db_object = connect_to_db()
-    subrs = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `subscribers`; CREATE TABLE `subscribers`(`subscriber_id` INT PRIMARY KEY NOT NULL " \
-            "UNIQUE AUTO_INCREMENT, `first_name` VARCHAR(64) NOT NULL, `last_name` VARCHAR(64) NOT NULL, `phone_number` " \
-            "VARCHAR(16) NOT NULL, `postal_code` INT(11) NOT NULL, `installation_id` INT(11) NOT NULL, `active` boolean " \
-            "NOT NULL DEFAULT 1,`age` INT(11) NULL, `gender` VARCHAR(32) NULL, FOREIGN KEY (`installation_id`) " \
-            "REFERENCES `installations`(`installation_id`) ON UPDATE CASCADE ON DELETE CASCADE);"
-    curr = execute(db_object, subrs)
-    curr.close()
-
-    db_object = connect_to_db()
-    pkgs = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `packages`; CREATE TABLE `packages`(`package_id` INT PRIMARY KEY NOT NULL UNIQUE " \
-           "AUTO_INCREMENT, `package_name` VARCHAR(64) NOT NULL UNIQUE, `standard_price` FLOAT(5,2) NOT NULL, " \
-           "`premium_price` FLOAT(5,2) NOT NULL);"
-    curr = execute(db_object, pkgs)
-    curr.close()
-
-    db_object = connect_to_db()
-    subns = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `subscriptions`; CREATE TABLE `subscriptions`(`subscription_id` INT PRIMARY KEY " \
-            "NOT NULL UNIQUE AUTO_INCREMENT, `package_id` INT(11) NOT NULL, `subscriber_id` INT(11) NOT NULL, " \
-            "`time_start` DATETIME NOT NULL, `last_renewed` DATETIME NOT NULL, `subscription_status` VARCHAR(32) " \
-            "NOT NULL DEFAULT \"New\", `premium` boolean NOT NULL DEFAULT 0, `subscriber_rating` INT(11) NULL, " \
-            "FOREIGN KEY (`package_id`) REFERENCES `packages`(`package_id`) ON UPDATE CASCADE ON DELETE CASCADE, " \
-            "FOREIGN KEY (`subscriber_id`) REFERENCES `subscribers`(`subscriber_id`) " \
-            "ON UPDATE CASCADE ON DELETE CASCADE);"
-    curr = execute(db_object, subns)
-    curr.close()
-
-    db_object = connect_to_db()
-    genres = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `channel_genres`; CREATE TABLE `channel_genres`(`channel_genre_id` INT PRIMARY KEY " \
-             "NOT NULL UNIQUE AUTO_INCREMENT, `genre_name` VARCHAR(32) NOT NULL UNIQUE, `kid_friendly` " \
-             "boolean NOT NULL DEFAULT 0);"
-    curr = execute(db_object, genres)
-    curr.close()
-
-    db_object = connect_to_db()
-    channels = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `channels`; CREATE TABLE `channels`(`channel_id` INT PRIMARY KEY NOT NULL UNIQUE " \
-               "AUTO_INCREMENT, `channel_name` VARCHAR(64) NOT NULL, `channel_number` INT(11) NULL UNIQUE, " \
-               "`channel_genre_id` INT(11) NULL, FOREIGN KEY (`channel_genre_id`) REFERENCES " \
-               "`channel_genres`(`channel_genre_id`) ON UPDATE CASCADE ON DELETE CASCADE);"
-    curr = execute(db_object, channels)
-    curr.close()
-
-    db_object = connect_to_db()
-    channel_pkgs = "SET FOREIGN_KEY_CHECKS=0; DROP TABLE if EXISTS `channel_packages`; CREATE TABLE `channel_packages`(`channel_package_id` INT " \
-                   "PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT, `package_id` INT(11) NOT NULL, `channel_id` INT(11) " \
-                   "NOT NULL, FOREIGN KEY (`package_id`) REFERENCES `packages`(`package_id`) ON UPDATE CASCADE " \
-                   "ON DELETE CASCADE, FOREIGN KEY (`channel_id`) REFERENCES `channels`(`channel_id`) " \
-                   "ON UPDATE CASCADE ON DELETE CASCADE);"
-    curr = execute(db_object, channel_pkgs)
-    curr.close()
-    return render_template('added_success.html')
-
-
-@app.route('/pop-all-tables')
-def populate_all():
-    db_object = connect_to_db()
-    techs = "INSERT INTO `technicians` (first_name, last_name, employer_id, start_date) VALUES (\"Sally\", \"Jones\", " \
-            "\"e6fb2a3c-198d-49f0-a473-92283b9e2759\", \"2018-10-20\"), (\"Robert\", \"Smith\", " \
-            "\"4d139544-d6dd-4d3d-80f8-34d96666f1fa\", \"2018-11-20\"), (\"Samuel\", \"Johnson\", " \
-            "\"744d2a6e-1981-4c9f-ba17-7ae6a39bea12\", \"2019-10-20\"), (\"Lana\", \"Walker\", " \
-            "\"045c1c03-7999-4b1a-a9a0-6047e32cc18b\", \"2018-10-23\");"
-    curr = execute(db_object, techs)
-    curr.close()
-
-    db_object = connect_to_db()
-    installs = "INSERT INTO `installations` (technician_id, installation_rating, installation_date, comments) VALUES " \
-               "(1, NULL, \"2015-10-20\", NULL), (1, 4, \"2018-04-20\", " \
-               "\"Refunded customer due to putting hole in wall.\"), (2, 5, \"2019-10-09\", NULL), " \
-               "(3, NULL, \"2020-10-23\", \"Customer wants more information on premium packages.\");"
-    curr = execute(db_object, installs)
-    curr.close()
-
-    db_object = connect_to_db()
-    subrs = "INSERT INTO `subscribers` (first_name, last_name, phone_number, postal_code, installation_id, " \
-            "monthly_watch_time, active, age, gender) VALUES (\"Sarah\", \"Stubbs\", 555-333-5356, 78739, 2, 6440, 1, " \
-            "27, \"Female\"), (\"Richard\", \"Jackson\", 455-433-5256, 77335, 3, 9000, 1, 37, \"Male\"), (\"Brittney\", " \
-            "\"Cardone\", 555-773-5006, 91210, 4, 1800, 1, 25, \"Female\"), (\"Joseph\", \"Smith\", 665-333-9356, 33094, " \
-            "1, 900, 0, 60, NULL);"
-    curr = execute(db_object, subrs)
-    curr.close()
-
-    db_object = connect_to_db()
-    pkgs = "INSERT INTO `packages` (package_name, standard_price, premium_price) VALUES (\"Stars N More\", 3.49, 10.99), " \
-           "(\"Sports All Day\", 4.79, 12.00), (\"News And Brews\", 1.50, 6.00);"
-    curr = execute(db_object, pkgs)
-    curr.close()
-
-    db_object = connect_to_db()
-    subns = "INSERT INTO `subscriptions` (package_id, subscriber_id, time_start, last_renewed, subscription_status) " \
-            "VALUES (\"Sarah\", \"Stubbs\", 555-333-5356, 78739, 2, 6440, 1, 27, \"Female\"), (\"Richard\", \"Jackson\", " \
-            "455-433-5256, 77335, 3, 9000, 1, 37, \"Male\"), \"Brittney\", \"Cardone\", 555-773-5006, 91210, 4, " \
-            "1800, 1, 25, \"Female\"), (\"Joseph\", \"Smith\", 665-333-9356, 33094, 1, 900, 0, 60, NULL);"
-    curr = execute(db_object, subns)
-    curr.close()
-
-    db_object = connect_to_db()
-    genres = "INSERT INTO `packages` (genre_name, kid_friendly) VALUES (\"Adult Animation\", 0), (\"Sports\", 1), " \
-             "(\"Reality TV\", 0), (\"Children Animation\", 1), (\"Educational\", 1);"
-    curr = execute(db_object, genres)
-    curr.close()
-
-    db_object = connect_to_db()
-    channels = "INSERT INTO `channels` (channel_name, channel_number, channel_genre_id) VALUES (\"MTV\", 70, 3), " \
-               "(\"History\", 49, 5), (\"Disney\", 43, 4), (\"E!\", 66, 3), (\"ESPN\", 30, 2);"
-    curr = execute(db_object, channels)
-    curr.close()
-
-    db_object = connect_to_db()
-    channel_pkgs = "INSERT INTO `channel packages` (channel_id, package_id) " \
-                   "VALUES (1, 1, 3), (2, 3), (3, 4), (5, 5), (4, 3);"
-    curr = execute(db_object, channel_pkgs)
-    curr.close()
-
-    return render_template('tmp_base.html')
 
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@
     Number (1-999): <input type="number" name="channel-number" value="{{ channel[2] }}"><br>
     Genre*: <select name="channel-genre">
         {% for g in genres %}
-          <option value="{{ g[0] }}">{{ g[1] }}</option>
+          <option>{{ g[1] }}</option>
         {% endfor %}
     </select><br>
     <input type="submit" value="Submit">
