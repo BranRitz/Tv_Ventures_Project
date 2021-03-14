@@ -1,19 +1,19 @@
 * {
+    border: 0px;
     margin: 0px;
     padding: 0px;
     box-sizing: border-box;
-    width: 100%;
 }
 .navbar {
     background-color: rgb(248, 253, 255,0.9);
+    float: left;
 }
 .navbar a {
-    float: left;
     color: rgb(87,135,196);
     text-align: center;
-    padding: 2px 2px;
+    padding: 5px 1vw;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 23px;
 }
 .navbar a:hover {
     background-color: rgb(87, 135, 196, 0.5);

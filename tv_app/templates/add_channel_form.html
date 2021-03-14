@@ -8,12 +8,14 @@
 <head>
   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
 </head>
+<br>
 <h3>Add New Channel:</h3>
+<div>
 <form id="add-channel" action="/add-channel" method="post">
-    Name*: <input type="text" name="channel-name"><br>
-    Number* (1-999): <input type="number" name="channel-number"><br>
+    Name*: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp<input type="text" name="channel-name"><br><br>
+    Number* (1-999): <input type="number" name="channel-number"><br><br>
 
-    Genre: <select name="channel-genre">
+    Genre: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp <select name="channel-genre">
         {% for g in genres %}
           <option value="{{ g[0] }}">{{ g[1] }}</option>
         {% endfor %}
@@ -21,10 +23,11 @@
     <input type='button' name='addGenre' value='Add Genre' onclick="window.open('/add-genre', 'popUpWindow',
     'height=400,width=600,left=10,top=10,,scrollbars=yes,menubar=no'); return false;">
     <br>
-
+    <br>
     <input type="submit" value="Submit">
  </form>
-<br>
+ <br>
 <p>*Required</p>
 <br/>
+</div>
 {% endblock %}

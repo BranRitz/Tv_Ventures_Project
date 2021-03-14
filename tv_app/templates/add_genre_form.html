@@ -9,12 +9,15 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
   </head>
 <h3>Add New Genre:</h3>
+<div>
 <form id="add-genre" action="/add-genre" method="post">
-    Genre Name*: <input type="text" name="genre-name"><br>
+    Genre Name*: <input type="text" name="genre-name"><br><br>
     Kid Friendly?* <input type="checkbox" name="kid-friendly" value="true"><br>
+    <br>
     <input type="submit" value="Submit">
  </form>
 <br>
 <p>*Required</p>
 <br/>
+</div>
 {% endblock %}

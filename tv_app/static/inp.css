@@ -1,27 +1,42 @@
-input[type=text], select {
-    width: 40%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    box-sizing: border-box;
-  }
-  
-  input[type=submit] {
-    width: 40%;
-    background-color:rgb(87,135,196);
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    cursor: pointer;
-  }
+input {
+  box-shadow: 0 0 40px 40px rgb(248, 253, 255,0.9) inset, 0 0 0 0 rgb(248, 253, 255,0.9);      -webkit-transition: all 150ms ease-in-out;
+  transition: all 150ms ease-in-out;
+  color: rgb(87, 135, 196, 0.7);
+  padding: 1% 1%;
+  text-align: center;
+  display: inline-block;
+  font-size: 17px;
+  margin: 1px;
+  cursor: pointer;
+}
 
-  select {
-    width: 40%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    box-sizing: border-box;
-  }
-  
-  input[type=submit]:hover {
-    background-color: rgb(87, 135, 196, 0.5);;
-  }
+select {
+  box-shadow: 0 0 40px 40px rgb(248, 253, 255,0.9) inset, 0 0 0 0 rgb(248, 253, 255,0.9);      -webkit-transition: all 150ms ease-in-out;
+  transition: all 150ms ease-in-out;
+  color: rgb(87, 135, 196, 0.7);
+  padding: 1% 1%;
+  text-align: center;
+  display: inline-block;
+  font-size: 17px;
+  margin: 1px;
+  cursor: pointer;
+}
+
+input:hover {
+  box-shadow: 0 0 10px 0 rgb(87,135,196) inset, 0 0 10px 4px rgb(87,135,196);
+}
+
+input[type=checkbox] {
+  transform: scale(2);
+}
+
+div {
+  border-radius: 5px;
+  border-color: black;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+p {
+  margin: 1vw;
+}

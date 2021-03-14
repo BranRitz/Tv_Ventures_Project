@@ -7,11 +7,38 @@
 {% block content %}
 <head>
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='tabl.css') }}">
-  </head>
-<h3><a href='/add-subscriber'>Add New Subscriber</a></h3>
+    <style>
+      button {
+          box-shadow: 0 0 40px 40px rgb(248, 253, 255,0.9) inset, 0 0 0 0 rgb(248, 253, 255,0.9);
+          -webkit-transition: all 150ms ease-in-out;
+          transition: all 150ms ease-in-out;
+          color: rgb(87, 135, 196, 0.7);
+          padding: 1% 1%;
+          text-align: center;
+          display: inline-block;
+          font-size: 17px;
+          margin: 1px;
+          cursor: pointer;
+      }
 
-<h3>Subscribers</h3>
+      button:hover {
+          box-shadow: 0 0 10px 0 rgb(87,135,196) inset, 0 0 10px 4px rgb(87,135,196);
+      }
+      div {
+        border-radius: 5px;
+        border-color: black;
+        background-color: #f2f2f2;
+        padding: 20px;
+      }
+
+    </style>
+  </head>
+  <br>
+<h3><a href='/add-subscriber'>Add New Subscriber</a></h3>
+<br>
     <b>Search Subscribers</b><br>
+    <br>
+    <div>
     <form action="/subscribers" method="post">
         <label for="fnameSearch">First Name:</label>
         <input type="search" id="fnameSearch" name="fname"><br>
@@ -19,11 +46,15 @@
         <input type="search" id="lnameSearch" name="lname"><br>
         <label for="zipcodeSearch">Zip Code:</label>
         <input type="search" id="zipcodeSearch" name="zipcode"><br>
+        <br>
         <button type="submit" value="Submit">Search</button>
     </form>
+    <br>
     <input type='button' name='clearSearch' value='Clear Search' onclick="window.location='/subscribers'">
-    <br><br>
-
+    <br>
+    </div>
+    <br>
+    <h3>Subscribers</h3>
     <table id='tbl'>
         <thead>
             <th>ID</th>

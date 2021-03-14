@@ -11,12 +11,14 @@
 <br>
 <h3>Add New Technician:</h3>
 <br>
+<div>
 <form id="add-tech" action="/add-tech" method="post">
     First Name*: <input type="text" name="fname" onkeyup="this.value = this.value.toUpperCase();"><br>
     Last Name*: <input type="text" name="lname" onkeyup="this.value = this.value.toUpperCase();"><br>
-    Date*: <input type="date" name="start_date" value="2021-02-24"><br>
+    Date*: &nbsp &nbsp &nbsp &nbsp &nbsp <input type="date" name="start_date" value="2021-02-24"><br><br>
     <input type="submit" value="Submit">
  </form>
 <br>
 <p>*Required</p>
+</div>
 {% endblock %}

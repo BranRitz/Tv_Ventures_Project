@@ -9,6 +9,7 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
   </head>
 <h3>Add New Package:</h3>
+<div>
 <form id="add-package" action="/add-package" method="post">
     Package Name*: <input type="text" name="package-name"><br>
 
@@ -19,4 +20,5 @@
  <br>
 <p>*Required</p>
 <br/>
+</div>
 {% endblock %}

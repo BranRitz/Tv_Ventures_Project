@@ -2,13 +2,35 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>{% block title %} - My Site {% endblock %}</title>
+        <br>
+        <title>{% block title %} {% endblock %}</title>
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='navbar.css') }}">
+        <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script>
+            $(function(){
+                $('a').each(function(){
+                    if ($(this).prop('href') == window.location.href) {
+                        $(this).addClass('current'); $(this).parents('navbar').addClass('current');
+                    }
+                });
+            });
+        </script>
+        <style>
+            h1 {text-align: center;}
+            h3 {margin: 1vw;}
+            p {margin: 1vw;}
+            b {margin: 1vw;}
+            label {margin: 1vw;}
+            input {margin: 1vw;}
+            button {margin: 1vw;}
+        </style>
     </head>
     <body>
         {% block content_top %} {% endblock %}
+        <br>
         <div class="navbar">
-            <a class="current" href="/">Home</a>
+            {% block class %} {% endblock %}
+            <a href="/">Home</a>
             <a href='/channels'>Channels</a>
             <a href='/channel-packages'>Channel Packages</a>
             <a href='/technicians'>Technicians</a>
