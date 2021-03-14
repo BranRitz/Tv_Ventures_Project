@@ -6,17 +6,19 @@
 
 {% block content %}
 <head>
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inpt.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
   </head>
 <br>
 <h3>Update Installation:</h3>
 <br>
+<div>
 <form id="update-install" action="/update-install/{{ install[0] }}" method="post">
     Rating (1-5): <input type="number" name="rating" value = "{{ install[2] }}"><br>
     Comments: <input type="text" name="install-comment" value = "{{ install[3] }}"><br>
     <input type="submit" value="Submit">
  </form>
 <br/>
+</div>
 {% endblock %}
 
 

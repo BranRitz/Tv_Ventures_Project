@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content_top %}
-<h1>{% block title %}TUpdate Package{% endblock %}</h1>
+<h1>{% block title %}Update Package{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
 <head>
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inpt.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
   </head>
 <h3>Update Package:</h3>
+<div>
 <form id="update-package" action="/update-package/{{ package[0] }}" method="post">
     Package Name: <input type="text" name="package-name" value = "{{ package[1] }}"><br>
     Standard Price: <input type="text" name="standard-price" value = "{{ package[2] }}"><br>
@@ -16,4 +17,5 @@
     <input type="submit" value="Submit">
  </form>
 <br/>
+</div>
 {% endblock %}

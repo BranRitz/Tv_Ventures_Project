@@ -6,9 +6,10 @@
 
 {% block content %}
 <head>
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inpt.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
   </head>
 <h3>Update Subscription:</h3>
+<div>
 <form id="update-subscription" action="/update-subscription/{{ subscription[0] }}" method="post">
     Last Renewal: <input type="datetime-local" name="renewal-date" value="{{ subscription[4] }}"><br>
     Status: <input type="text" name="status" value="{{ subscription[5] }}"><br>
@@ -19,4 +20,5 @@
 <br>
 <p>*Whatever value is submitted will take. Blank does not mean empty, it means False.</p>
 <br/>
+</div>
 {% endblock %}

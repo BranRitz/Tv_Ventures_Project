@@ -6,9 +6,10 @@
 
 {% block content %}
 <head>
-  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inpt.css') }}">
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
 </head>
 <h3>Update Channel:</h3>
+<div>
 <form id="update-channel" action="/update-channel/{{ channel[0] }}" method="post">
     Name: <input type="text" name="channel-name" value="{{ channel[1] }}"><br>
     Number (1-999): <input type="number" name="channel-number" value="{{ channel[2] }}"><br>
@@ -22,4 +23,5 @@
 <br>
 <p>*Whatever value is submitted will take. Blank does not mean empty, it means None.</p>
 <br/>
+</div>
 {% endblock %}
