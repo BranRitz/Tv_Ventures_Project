@@ -8,16 +8,18 @@
 <head>
   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='inp.css') }}">
 </head>
+<br>
 <h3>Update Channel:</h3>
+
 <div>
 <form id="update-channel" action="/update-channel/{{ channel[0] }}" method="post">
-    Name: <input type="text" name="channel-name" value="{{ channel[1] }}"><br>
+    Name: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp<input type="text" name="channel-name" value="{{ channel[1] }}"><br>
     Number (1-999): <input type="number" name="channel-number" value="{{ channel[2] }}"><br>
-    Genre*: <select name="channel-genre">
+    Genre*: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp&nbsp<select name="channel-genre">
         {% for g in genres %}
           <option>{{ g[1] }}</option>
         {% endfor %}
-    </select><br>
+    </select><br><br>
     <input type="submit" value="Submit">
  </form>
 <br>
